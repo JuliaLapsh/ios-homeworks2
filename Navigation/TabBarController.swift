@@ -27,7 +27,7 @@ class TabBarController: UITabBarController {
             case .feed:
                 return UIImage(systemName: "house")
             case .profile:
-                return UIImage(systemName: "person.circle")
+                return UIImage(systemName: "person")
             }
         }
     }

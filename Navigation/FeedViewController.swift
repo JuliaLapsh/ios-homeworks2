@@ -8,12 +8,6 @@
 import UIKit
 
 class FeedViewController: UIViewController {
-    
-    struct Post {
-        var title: String
-    }
-    
-    let post = Post.init(title: "Мой пост")
 
     let button: UIButton = {
         let button = UIButton(type: .system)
@@ -50,7 +44,6 @@ class FeedViewController: UIViewController {
     @objc func didTapButton() {
         let postVC = PostViewController()
         
-        postVC.navigationItem.title = post.title
         self.navigationController?.pushViewController(postVC, animated: true)
     }
 }

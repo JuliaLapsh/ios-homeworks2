@@ -12,7 +12,7 @@ class PostViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = .systemYellow
-        
+        self.navigationItem.title = "Мой пост"
         let infoBarButton = UIBarButtonItem(image: UIImage(systemName: "info.circle"), style: .plain, target: self, action: #selector(infoBarButton))
         
         self.navigationItem.rightBarButtonItem = infoBarButton
