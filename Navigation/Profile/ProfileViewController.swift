@@ -15,6 +15,15 @@ class ProfileViewController: UIViewController {
         return view
     }()
     
+    private lazy var newButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("Button", for: .normal)
+        button.setTitleColor(.white, for: .normal)
+        button.backgroundColor = .systemBlue
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.setupNavigationBar()
@@ -33,15 +42,19 @@ class ProfileViewController: UIViewController {
     
       override func viewWillLayoutSubviews() {
         self.view.addSubview(self.profileHeaderView)
+        self.view.addSubview(self.newButton)
         
         let topConstraint = self.profileHeaderView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor)
-        let leadingConstraint = self.profileHeaderView.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor)
-        let trailingConstraint = self.profileHeaderView.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor)
+        let leadingConstraint = self.profileHeaderView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor)
+        let trailingConstraint = self.profileHeaderView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor)
+        let heightConstraint = self.profileHeaderView.heightAnchor.constraint(equalToConstant: 220)
           
-        let heightConstraint = self.profileHeaderView.heightAnchor.constraint(equalToConstant: 170)
+          let leadingButtonConstraint = self.newButton.leadingAnchor.constraint(equalTo: self.view.leadingAnchor)
+          let trailingButtonConstraint = self.newButton.trailingAnchor.constraint(equalTo: self.view.trailingAnchor)
+          let bottomButtonConstraint = self.newButton.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor)
+          let heightButtomConstraint = self.newButton.heightAnchor.constraint(equalToConstant: 50)
         
-        NSLayoutConstraint.activate([topConstraint, leadingConstraint, trailingConstraint, heightConstraint].compactMap({ $0 }))
-     
+        NSLayoutConstraint.activate([topConstraint, leadingConstraint, trailingConstraint, heightConstraint, leadingButtonConstraint, trailingButtonConstraint, bottomButtonConstraint, heightButtomConstraint].compactMap({ $0 }))
     }
     
 }
