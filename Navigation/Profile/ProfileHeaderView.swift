@@ -45,7 +45,7 @@ class ProfileHeaderView: UIView, UITextFieldDelegate {
         let stackView = UIStackView()
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.axis = .horizontal
-        stackView.spacing = 10
+        stackView.spacing = 16
         
         return stackView
     }()
@@ -104,6 +104,7 @@ class ProfileHeaderView: UIView, UITextFieldDelegate {
         button.backgroundColor = .systemBlue
         button.layer.shadowColor = UIColor.black.cgColor
         button.layer.shadowOffset = CGSize(width: 4, height: 4)
+        button.layer.shadowRadius = 4
         button.layer.shadowOpacity = 0.7
         button.addTarget(self, action: #selector(didTapStatusButton), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -116,7 +117,6 @@ class ProfileHeaderView: UIView, UITextFieldDelegate {
     private var buttonTopConstraint: NSLayoutConstraint?
     
     private func drawSelf() {
-        self.backgroundColor = .systemGray3
         
         self.addSubview(horizontalStackView)
         self.addSubview(setStatusButton)
