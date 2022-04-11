@@ -28,7 +28,6 @@ class ProfileHeaderView: UIView, UITextFieldDelegate {
         return imageView
     }()
     
-
     private lazy var verticalStackView: UIStackView = {
         
         let stackView = UIStackView()

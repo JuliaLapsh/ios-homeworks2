@@ -48,7 +48,6 @@ class ProfileViewController: UIViewController {
         self.tableView.tableHeaderView = tableHeaderView
         self.setupNavigationBar()
         self.setupView()
-        tapGesture()
         setupProfileHeaderView()
     }
 
@@ -86,10 +85,6 @@ class ProfileViewController: UIViewController {
         NSLayoutConstraint.activate([ topConstraint, leadingConstraint, trailingConstraint, bottomConstraint, heightConstraint, widthConstraint ].compactMap( {$0} ))
     }
     
-    func tapGesture() {
-        let tapGesture = UITapGestureRecognizer(target: self.view, action: #selector(view.endEditing))
-        self.view.addGestureRecognizer(tapGesture)
-    }
 
     func updateHeaderViewHeight(for header: UIView?) {
         guard let header = header else { return }

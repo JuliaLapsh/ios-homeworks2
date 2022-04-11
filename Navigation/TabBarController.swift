@@ -12,6 +12,7 @@ class TabBarController: UITabBarController {
     private enum TabBarItem {
         case feed
         case profile
+        case gestures
         
         var title: String {
             switch self {
@@ -19,6 +20,8 @@ class TabBarController: UITabBarController {
                 return "Лента"
             case .profile:
                 return "Профиль"
+            case .gestures:
+                return "Жесты"
             }
         }
 
@@ -28,6 +31,8 @@ class TabBarController: UITabBarController {
                 return UIImage(systemName: "house")
             case .profile:
                 return UIImage(systemName: "person")
+            case .gestures:
+                return UIImage(systemName: "hand.raised")
             }
         }
     }
@@ -38,7 +43,7 @@ class TabBarController: UITabBarController {
     }
     
     func setupTabBar() {
-        let items: [TabBarItem] = [.feed, .profile]
+        let items: [TabBarItem] = [.feed, .profile, .gestures]
         
         self.viewControllers = items.map({ tabBarItem in
             switch tabBarItem {
@@ -47,6 +52,8 @@ class TabBarController: UITabBarController {
                 return UINavigationController(rootViewController: FeedViewController)
             case .profile:
                 return UINavigationController(rootViewController: LogInViewController())
+            case .gestures:
+                return UINavigationController(rootViewController: GesturesViewController())
             }
         })
         self.viewControllers?.enumerated().forEach({ (index, vc) in
