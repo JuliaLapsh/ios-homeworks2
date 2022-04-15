@@ -169,6 +169,11 @@ class ProfileHeaderView: UIView, UITextFieldDelegate {
             textField.becomeFirstResponder()
 
         } else {
+            guard textField.text != "" else {
+                textField.backgroundColor = .systemRed
+                textField.vibrate()
+                return
+            }
             statusText = textField.text!
             status.text = "\(statusText ?? "")"
             setStatusButton.setTitle("Show status", for: .normal)
@@ -190,5 +195,17 @@ class ProfileHeaderView: UIView, UITextFieldDelegate {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+}
+
+extension UIView {
+    func vibrate() {
+    let animation = CABasicAnimation(keyPath: "position")
+            animation.duration = 0.05
+            animation.repeatCount = 5
+            animation.autoreverses = true
+    animation.fromValue = NSValue(cgPoint: CGPoint(x: self.center.x - 5.0, y: self.center.y))
+    animation.toValue = NSValue(cgPoint: CGPoint(x: self.center.x + 5.0, y: self.center.y))
+    layer.add(animation, forKey: "position")
     }
 }
