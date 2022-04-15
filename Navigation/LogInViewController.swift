@@ -46,20 +46,21 @@ class LogInViewController: UIViewController, UITextFieldDelegate {
         return imageView
     }()
     
-    private lazy var stackView: UIStackView = {
-        let stackView = UIStackView()
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        stackView.axis = .vertical
-        stackView.distribution = .fillProportionally
-        stackView.spacing = 16
-        return stackView
+    private lazy var warningLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Введите 6 или более символов"
+        label.textColor = .black
+        label.isHidden = true
+        label.font = UIFont(name: "Helvetica-Regular", size: 14)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
     }()
     
     private lazy var textFieldStackView: UIStackView = {
        let stackView = UIStackView()
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.axis = .vertical
-        stackView.distribution = .fillProportionally
+        stackView.distribution = .fillEqually
         stackView.spacing = 0
         stackView.layer.cornerRadius = 10
         stackView.clipsToBounds = true
@@ -116,7 +117,7 @@ class LogInViewController: UIViewController, UITextFieldDelegate {
         button.layer.cornerRadius = 10
         button.backgroundColor = UIColor(named: "Color")
         
-        if button.isSelected {
+       /* if button.isSelected {
             button.alpha = 0.8
         } else if button.isHighlighted {
             button.alpha = 0.8
@@ -125,18 +126,20 @@ class LogInViewController: UIViewController, UITextFieldDelegate {
         } else {
             button.alpha = 1
         }
+        */
         
         button.addTarget(self, action: #selector(self.didTapLogInButton), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
          return button
     }()
     
+    private var topButtonConstraint: NSLayoutConstraint?
+    
     private func setupView() {
         self.view.addSubview(scrollView)
-        self.scrollView.addSubview(stackView)
         self.scrollView.addSubview(logo)
-        self.stackView.addArrangedSubview(textFieldStackView)
-        self.stackView.addArrangedSubview(logInButton)
+        self.scrollView.addSubview(textFieldStackView)
+        self.scrollView.addSubview(logInButton)
         self.textFieldStackView.addArrangedSubview(nameTextField)
         self.textFieldStackView.addArrangedSubview(passwordTextField)
         
@@ -148,19 +151,24 @@ class LogInViewController: UIViewController, UITextFieldDelegate {
         let logoCenterConstraint = self.logo.centerXAnchor.constraint(equalTo: self.scrollView.centerXAnchor)
         let logoHeightConstraint = self.logo.heightAnchor.constraint(equalToConstant: 100)
         let logoWidthConstraint = self.logo.widthAnchor.constraint(equalToConstant: 100)
-        let logoBottomConstraint = self.logo.bottomAnchor.constraint(equalTo: self.stackView.topAnchor, constant: -70)
+        let logoBottomConstraint = self.logo.bottomAnchor.constraint(equalTo: self.textFieldStackView.topAnchor, constant: -70)
         
-        let stackViewCenterXConstraint = self.stackView.centerXAnchor.constraint(equalTo: self.scrollView.centerXAnchor)
-        let stackViewCenterYConstraint = self.stackView.centerYAnchor.constraint(equalTo: self.scrollView.centerYAnchor)
-        let stackViewLeadingConstaraint = self.stackView.leadingAnchor.constraint(equalTo: self.scrollView.leadingAnchor, constant: 16)
-        let stackViewTrailingConstaraint = self.stackView.trailingAnchor.constraint(equalTo: self.scrollView.trailingAnchor, constant: -16)
+        let stackViewCenterXConstraint = self.textFieldStackView.centerXAnchor.constraint(equalTo: self.scrollView.centerXAnchor)
+        let stackViewCenterYConstraint = self.textFieldStackView.centerYAnchor.constraint(equalTo: self.scrollView.centerYAnchor)
+        let stackViewLeadingConstaraint = self.textFieldStackView.leadingAnchor.constraint(equalTo: self.scrollView.leadingAnchor, constant: 16)
+        let stackViewTrailingConstaraint = self.textFieldStackView.trailingAnchor.constraint(equalTo: self.scrollView.trailingAnchor, constant: -16)
         
         let nameTextFieldHeightConstraint = self.nameTextField.heightAnchor.constraint(equalToConstant: 50)
         let passwordTextFieldHeightConstraint = self.passwordTextField.heightAnchor.constraint(equalToConstant: 50)
-        let buttonHeightConstraint = self.logInButton.heightAnchor.constraint(equalToConstant: 50)
+        //let buttonHeightConstraint = self.logInButton.heightAnchor.constraint(equalToConstant: 50)
         
-        NSLayoutConstraint.activate([ scrollViewTopConstraint, scrollViewLeftConstraint, scrollViewRightConstraint, scrollViewBottomConstraint, logoCenterConstraint, logoHeightConstraint, logoWidthConstraint, logoBottomConstraint, stackViewCenterXConstraint, stackViewCenterYConstraint, stackViewLeadingConstaraint, stackViewTrailingConstaraint, nameTextFieldHeightConstraint, passwordTextFieldHeightConstraint, buttonHeightConstraint ])
-    
+        self.topButtonConstraint = self.logInButton.topAnchor.constraint(equalTo: self.textFieldStackView.bottomAnchor, constant: 16)
+        self.topButtonConstraint?.priority = UILayoutPriority(rawValue: 999)
+        let buttonLeadingConstraint = self.logInButton.leadingAnchor.constraint(equalTo: self.scrollView.leadingAnchor, constant: 16)
+        let buttonTrailingConstraint = self.logInButton.trailingAnchor.constraint(equalTo: self.scrollView.trailingAnchor, constant: -16)
+        let heightButtonConstraint = self.logInButton.heightAnchor.constraint(equalToConstant: 50)
+        
+        NSLayoutConstraint.activate([ scrollViewTopConstraint, scrollViewLeftConstraint, scrollViewRightConstraint, scrollViewBottomConstraint, logoCenterConstraint, logoHeightConstraint, logoWidthConstraint, logoBottomConstraint, stackViewCenterXConstraint, stackViewCenterYConstraint, stackViewLeadingConstaraint, stackViewTrailingConstaraint, nameTextFieldHeightConstraint, passwordTextFieldHeightConstraint, heightButtonConstraint, self.topButtonConstraint, buttonLeadingConstraint,  buttonTrailingConstraint].compactMap( {$0} ))
     }
     
     private func tapGesture() {
@@ -171,6 +179,20 @@ class LogInViewController: UIViewController, UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         self.view.endEditing(true)
         return false
+    }
+    
+    func validPassword(userPassword : String) -> Bool {
+
+            let passwordReg =  (".{6,}")
+            let passwordTesting = NSPredicate(format: "SELF MATCHES %@", passwordReg)
+            return passwordTesting.evaluate(with: userPassword)
+        }
+
+    func isValidEmail(userEmail: String) -> Bool {
+        let emailRegEx = "(?:[a-z0-9!#$%\\&'*+/=?\\^_`{|}~-]+(?:\\.[a-z0-9!#$%\\&'*+/=?\\^_`{|}"+"~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\"+"x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-"+"z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5"+"]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-"+"9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21"+"-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])"
+
+        let emailTest = NSPredicate(format:"SELF MATCHES[c] %@", emailRegEx)
+        return emailTest.evaluate(with: userEmail)
     }
     
     @objc private func didTapLogInButton() {
@@ -184,9 +206,54 @@ class LogInViewController: UIViewController, UITextFieldDelegate {
             logInButton.alpha = 1
         }
         
-        let profileVC = ProfileViewController()
-        self.navigationController?.pushViewController(profileVC, animated: true)
+        let topLabelConstraint = self.warningLabel.topAnchor.constraint(equalTo: self.textFieldStackView.bottomAnchor, constant: -10)
+        let leadingLabelConstraint = self.warningLabel.leadingAnchor.constraint(equalTo: self.textFieldStackView.leadingAnchor)
+        let heightLabelConstraint = self.warningLabel.heightAnchor.constraint(equalToConstant: 40)
+        let trailingLabelConstraint = self.warningLabel.trailingAnchor.constraint(equalTo: self.textFieldStackView.trailingAnchor)
+
+        self.topButtonConstraint = self.logInButton.topAnchor.constraint(equalTo: self.warningLabel.bottomAnchor, constant: 16)
+
+        let email = isValidEmail(userEmail: nameTextField.text!)
+
+                if (email == false) {
+                    let alert = UIAlertController(title: "Внимание!", message: "Некорректный email", preferredStyle: UIAlertController.Style.alert)
+                    alert.addAction(UIAlertAction(title: "OK", style: UIAlertAction.Style.default, handler: nil))
+                    self.present(alert, animated: true, completion: nil)
+                }
+
+        let password = validPassword(userPassword: passwordTextField.text!)
+
+                if(password == false)
+                {
+                    self.warningLabel.isHidden = false
+                    self.scrollView.addSubview(self.warningLabel)
+                    self.topButtonConstraint?.isActive = false
+                    NSLayoutConstraint.activate([topLabelConstraint, leadingLabelConstraint, trailingLabelConstraint, heightLabelConstraint, topButtonConstraint].compactMap( {$0} ))
+                } else {
+                    self.warningLabel.removeFromSuperview()
+                    NSLayoutConstraint.deactivate([ topLabelConstraint, leadingLabelConstraint, trailingLabelConstraint, heightLabelConstraint
+                                ].compactMap( {$0} ))
+                    self.warningLabel.isHidden = true
+                }
+
+           if self.nameTextField.text == "" {
+               self.nameTextField.backgroundColor = .systemRed
+        } else if passwordTextField.text == "" {
+            self.passwordTextField.backgroundColor = .systemRed
+        } else if self.nameTextField.text == "tyuv_72@mail.ru" && passwordTextField.text == "123456789" {
+
+            let profileVC = ProfileViewController()
+            self.navigationController?.pushViewController(profileVC, animated: true)
         }
+        else {
+            let alert = UIAlertController(title: "Внимание!", message: "Данные введены неверно", preferredStyle: UIAlertController.Style.alert)
+            alert.addAction(UIAlertAction(title: "OK", style: UIAlertAction.Style.default, handler: nil))
+            self.present(alert, animated: true, completion: nil)
+                }
+
+}
+    
+    
     
 }
     

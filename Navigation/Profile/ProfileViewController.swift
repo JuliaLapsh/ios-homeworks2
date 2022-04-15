@@ -10,7 +10,7 @@ import UIKit
 class ProfileViewController: UIViewController {
     
     private lazy var tableView: UITableView = {
-        let tableView = UITableView()
+        let tableView = UITableView(frame: .zero)
         tableView.backgroundColor = .systemGray6
         tableView.translatesAutoresizingMaskIntoConstraints = false
         tableView.dataSource = self
@@ -85,7 +85,6 @@ class ProfileViewController: UIViewController {
         NSLayoutConstraint.activate([ topConstraint, leadingConstraint, trailingConstraint, bottomConstraint, heightConstraint, widthConstraint ].compactMap( {$0} ))
     }
     
-
     func updateHeaderViewHeight(for header: UIView?) {
         guard let header = header else { return }
         header.frame.size.height = header.systemLayoutSizeFitting(CGSize(width: view.bounds.width, height: CGFloat(heightConstraint!.constant))).height
@@ -133,7 +132,7 @@ extension ProfileViewController: UITableViewDataSource, UITableViewDelegate {
 
             return cell
         }
-
+        cell.delegate = self
         let post = self.dataSource[indexPath.row - 1]
         let viewModel = PostTableViewCell.ViewModel(author: post.author,
                                                     description: post.description, image: post.image, likes: post.likes, views: post.views)
@@ -149,6 +148,23 @@ extension ProfileViewController: UITableViewDataSource, UITableViewDelegate {
             self.navigationController?.pushViewController(photoVC, animated: true)
         }
     }
+    
+    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+        if indexPath.row == 0 {
+            return .none
+        } else {
+            return .delete
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+
+        tableView.beginUpdates()
+        self.dataSource.remove(at: indexPath.row - 1)
+        tableView.deleteRows(at: [indexPath], with: .automatic)
+        tableView.endUpdates()
+    }
+    
 }
 
 extension ProfileViewController: ProfileHeaderViewProtocol {
@@ -168,3 +184,39 @@ extension ProfileViewController: ProfileHeaderViewProtocol {
     }
 }
 
+extension ProfileViewController: PostTableViewCellProtocol {
+
+    func tapPosts(cell: PostTableViewCell) {
+        let largePostView = PostView()
+        guard let index = self.tableView.indexPath(for: cell)?.row else { return }
+        let indexPath = IndexPath(row: index, section: 0)
+        let post = self.dataSource[indexPath.row - 1]
+
+        let viewModel = PostView.ViewModel(
+            author: post.author, description: post.description, image: post.image, likes: post.likes, views: post.views)
+
+        largePostView.setup(with: viewModel)
+        self.view.addSubview(largePostView)
+
+        largePostView.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            largePostView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            largePostView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            largePostView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            largePostView.topAnchor.constraint(equalTo: view.topAnchor)
+        ])
+        
+
+        self.dataSource[indexPath.row - 1].views += 1
+        self.tableView.reloadRows(at: [indexPath], with: .fade)
+
+    }
+
+    func tapLikes(cell: PostTableViewCell) {
+        guard let index = self.tableView.indexPath(for: cell)?.row else { return }
+        let indexPath = IndexPath(row: index, section: 0)
+        self.dataSource[indexPath.row - 1].likes += 1
+        self.tableView.reloadRows(at: [indexPath], with: .fade)
+    }
+}

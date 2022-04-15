@@ -91,4 +91,20 @@ extension PhotosViewController: UICollectionViewDataSource, UICollectionViewDele
 
         return UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
     }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PhotoCell", for: indexPath) as! PhotosCollectionViewCell
+            let image = images[indexPath.item]
+            cell.photoImageView.image = image
+        cell.frame = self.view.bounds
+        cell.contentMode = .scaleAspectFit
+        cell.isUserInteractionEnabled = true
+        let tap = UITapGestureRecognizer(target: self, action: #selector(dismissImage))
+        cell.addGestureRecognizer(tap)
+        self.view.addSubview(cell)
+    }
+    
+    @objc func dismissImage(_ sender: UITapGestureRecognizer) {
+        sender.view?.removeFromSuperview()
+    }
 }
