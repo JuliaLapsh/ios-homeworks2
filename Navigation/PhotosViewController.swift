@@ -12,8 +12,8 @@ class PhotosViewController: UIViewController {
     private enum Constants {
         static let itemCount: CGFloat = 3
     }
-
-var images = [UIImage]()
+    
+    var images = [UIImage]()
 
     private lazy var layout: UICollectionViewFlowLayout = {
         let layout = UICollectionViewFlowLayout()
@@ -55,7 +55,7 @@ override func viewDidLoad() {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        self.tabBarController?.tabBar.isHidden = false
+        self.tabBarController?.tabBar.isHidden = true
         self.navigationController?.navigationBar.isHidden = false
         self.navigationItem.title = "Photo Gallery"
     }
@@ -70,7 +70,6 @@ override func viewDidLoad() {
 extension PhotosViewController: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-
     return images.count
     }
 
@@ -93,18 +92,31 @@ extension PhotosViewController: UICollectionViewDataSource, UICollectionViewDele
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PhotoCell", for: indexPath) as! PhotosCollectionViewCell
-            let image = images[indexPath.item]
-            cell.photoImageView.image = image
-        cell.frame = self.view.bounds
-        cell.contentMode = .scaleAspectFit
-        cell.isUserInteractionEnabled = true
-        let tap = UITapGestureRecognizer(target: self, action: #selector(dismissImage))
-        cell.addGestureRecognizer(tap)
-        self.view.addSubview(cell)
+        let expandedCell = ExpandedPhotoCell()
+        expandedCell.delegate = self
+        self.view.addSubview(expandedCell)
+        expandedCell.imageExpandedCell.image = images[indexPath.item]
+        navigationController?.navigationBar.isHidden = true
+        NSLayoutConstraint.activate([
+            expandedCell.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            expandedCell.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            expandedCell.topAnchor.constraint(equalTo: view.topAnchor),
+            expandedCell.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
+        UIView.animate(withDuration: 0.1, animations: {
+            self.view.layoutIfNeeded()
+        }) { _ in
+            UIView.animate(withDuration: 0.3) {
+                expandedCell.buttonCancel.alpha = 1
+                expandedCell.backgroundColor = .black.withAlphaComponent(0.8)
+            }
+        }
     }
-    
-    @objc func dismissImage(_ sender: UITapGestureRecognizer) {
-        sender.view?.removeFromSuperview()
+}
+
+extension PhotosViewController: ExpandedCellDelegate {
+    func pressedButton(view: ExpandedPhotoCell) {
+        view.removeFromSuperview()
+        navigationController?.navigationBar.isHidden = false
     }
 }

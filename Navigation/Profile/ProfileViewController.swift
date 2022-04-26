@@ -7,8 +7,7 @@
 
 import UIKit
 
-class ProfileViewController: UIViewController {
-    
+final class ProfileViewController: UIViewController {
     private lazy var tableView: UITableView = {
         let tableView = UITableView(frame: .zero)
         tableView.backgroundColor = .systemGray6
@@ -23,42 +22,26 @@ class ProfileViewController: UIViewController {
 
         return tableView
     }()
-
-    private lazy var tableHeaderView: ProfileHeaderView = {
-        let view = ProfileHeaderView(frame: .zero)
-        view.delegate = self
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
-    }()
-
+    
     private lazy var jsonDecoder: JSONDecoder = {
         return JSONDecoder()
     }()
-
+    
     private var dataSource: [News.Post] = []
     
-    private var heightConstraint: NSLayoutConstraint?
-
     override func viewDidLoad() {
         super.viewDidLoad()
         self.fetchPosts { [ weak self ] posts in
             self?.dataSource = posts
             self?.tableView.reloadData()
         }
-        self.tableView.tableHeaderView = tableHeaderView
         self.setupNavigationBar()
         self.setupView()
-        setupProfileHeaderView()
     }
 
     private func setupNavigationBar() {
-        self.navigationController?.navigationBar.prefersLargeTitles = false
-        self.navigationItem.title = "Profile"
-    }
-
-    override func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
-        updateHeaderViewHeight(for: tableView.tableHeaderView)
+        self.tabBarController?.tabBar.isHidden = false
+        self.navigationController?.navigationBar.isHidden = false
     }
 
     private func setupView() {
@@ -70,24 +53,6 @@ class ProfileViewController: UIViewController {
         let bottomConstraint = self.tableView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor)
 
         NSLayoutConstraint.activate([ topConstraint, leadingConstraint, trailingConstraint, bottomConstraint ])
-    }
-
-    private func setupProfileHeaderView() {
-        self.view.backgroundColor = .lightGray
-
-        let topConstraint = self.tableHeaderView.topAnchor.constraint(equalTo: tableView.topAnchor)
-        let leadingConstraint = self.tableHeaderView.leadingAnchor.constraint(equalTo: tableView.leadingAnchor)
-        let trailingConstraint = self.tableHeaderView.trailingAnchor.constraint(equalTo: tableView.trailingAnchor)
-        let widthConstraint = self.tableHeaderView.widthAnchor.constraint(equalTo: tableView.widthAnchor)
-        self.heightConstraint = self.tableHeaderView.heightAnchor.constraint(equalToConstant: 220)
-        let bottomConstraint = self.tableHeaderView.bottomAnchor.constraint(equalTo: tableView.bottomAnchor)
-
-        NSLayoutConstraint.activate([ topConstraint, leadingConstraint, trailingConstraint, bottomConstraint, heightConstraint, widthConstraint ].compactMap( {$0} ))
-    }
-    
-    func updateHeaderViewHeight(for header: UIView?) {
-        guard let header = header else { return }
-        header.frame.size.height = header.systemLayoutSizeFitting(CGSize(width: view.bounds.width, height: CGFloat(heightConstraint!.constant))).height
     }
 
     private func fetchPosts(completion: @escaping ([News.Post]) -> Void) {
@@ -141,6 +106,14 @@ extension ProfileViewController: UITableViewDataSource, UITableViewDelegate {
     }
     }
     
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        return ProfileHeaderView()
+    }
+
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 250
+    }
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 
         if indexPath.row == 0 {
@@ -164,24 +137,6 @@ extension ProfileViewController: UITableViewDataSource, UITableViewDelegate {
         tableView.deleteRows(at: [indexPath], with: .automatic)
         tableView.endUpdates()
     }
-    
-}
-
-extension ProfileViewController: ProfileHeaderViewProtocol {
-
-    func didTapStatusButton(textFieldIsVisible: Bool, completion: @escaping () -> Void) {
-        self.heightConstraint?.constant = textFieldIsVisible ? 250 : 220
-
-        tableView.beginUpdates()
-        tableView.reloadSections(IndexSet(0..<1), with: .automatic)
-        tableView.endUpdates()
-
-        UIView.animate(withDuration: 0.3, delay: 0.0) {
-            self.view.layoutIfNeeded()
-        } completion: { _ in
-            completion()
-        }
-    }
 }
 
 extension ProfileViewController: PostTableViewCellProtocol {
@@ -190,6 +145,7 @@ extension ProfileViewController: PostTableViewCellProtocol {
         let largePostView = PostView()
         guard let index = self.tableView.indexPath(for: cell)?.row else { return }
         let indexPath = IndexPath(row: index, section: 0)
+        self.dataSource[indexPath.row - 1].views += 1
         let post = self.dataSource[indexPath.row - 1]
 
         let viewModel = PostView.ViewModel(
@@ -207,10 +163,7 @@ extension ProfileViewController: PostTableViewCellProtocol {
             largePostView.topAnchor.constraint(equalTo: view.topAnchor)
         ])
         
-
-        self.dataSource[indexPath.row - 1].views += 1
         self.tableView.reloadRows(at: [indexPath], with: .fade)
-
     }
 
     func tapLikes(cell: PostTableViewCell) {

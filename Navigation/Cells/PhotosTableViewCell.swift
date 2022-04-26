@@ -55,7 +55,6 @@ class PhotosTableViewCell: UITableViewCell {
         imageView.clipsToBounds = true
 
         return imageView
-
     }()
 
     private lazy var layout: UICollectionViewFlowLayout = {

@@ -19,6 +19,7 @@ class LogInViewController: UIViewController, UITextFieldDelegate {
         super.viewDidLoad()
         self.view.backgroundColor = .white
         self.navigationController?.navigationBar.isHidden = true
+        self.tabBarController?.tabBar.isHidden = true
         self.setupView()
         self.tapGesture()
         self.nameTextField.delegate = self
@@ -117,17 +118,6 @@ class LogInViewController: UIViewController, UITextFieldDelegate {
         button.layer.cornerRadius = 10
         button.backgroundColor = UIColor(named: "Color")
         
-       /* if button.isSelected {
-            button.alpha = 0.8
-        } else if button.isHighlighted {
-            button.alpha = 0.8
-        } else if !button.isEnabled {
-            button.alpha = 0.8
-        } else {
-            button.alpha = 1
-        }
-        */
-        
         button.addTarget(self, action: #selector(self.didTapLogInButton), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
          return button
@@ -160,7 +150,6 @@ class LogInViewController: UIViewController, UITextFieldDelegate {
         
         let nameTextFieldHeightConstraint = self.nameTextField.heightAnchor.constraint(equalToConstant: 50)
         let passwordTextFieldHeightConstraint = self.passwordTextField.heightAnchor.constraint(equalToConstant: 50)
-        //let buttonHeightConstraint = self.logInButton.heightAnchor.constraint(equalToConstant: 50)
         
         self.topButtonConstraint = self.logInButton.topAnchor.constraint(equalTo: self.textFieldStackView.bottomAnchor, constant: 16)
         self.topButtonConstraint?.priority = UILayoutPriority(rawValue: 999)
@@ -244,17 +233,12 @@ class LogInViewController: UIViewController, UITextFieldDelegate {
 
             let profileVC = ProfileViewController()
             self.navigationController?.pushViewController(profileVC, animated: true)
-        }
-        else {
+        } else {
             let alert = UIAlertController(title: "Внимание!", message: "Данные введены неверно", preferredStyle: UIAlertController.Style.alert)
             alert.addAction(UIAlertAction(title: "OK", style: UIAlertAction.Style.default, handler: nil))
             self.present(alert, animated: true, completion: nil)
                 }
-
-}
-    
-    
-    
+    }
 }
     
 
